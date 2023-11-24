@@ -1,0 +1,1 @@
+web: gunicorn bizhub.wsgi --log-file -
