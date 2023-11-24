@@ -44,7 +44,7 @@ def current_user(request):
 # "business_name": "na my iz",
 # "password": "chryz1342003"
 # }
-def account_create(request):
+def account_register(request):
     # logout(request)
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
