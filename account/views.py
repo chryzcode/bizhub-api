@@ -38,14 +38,9 @@ def current_user(request):
     return Response(serializer.data)
 
 @api_view(['POST'])
-# {
-# "email": "chryzhub@gmail.com",
-# "full_name": "hub dem",
-# "business_name": "na my iz",
-# "password": "chryz1342003"
-# }
 def account_register(request):
-    # logout(request)
+    if request.user:
+        request.user.auth_token.delete()
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -57,12 +52,6 @@ def account_register(request):
 
 
 @api_view(['PUT'])
-
-# {
-# "full_name": "Ola Chryz",
-# "business_name": "njgog biz"
-# }
-
 @permission_classes([IsAuthenticated])
 def account_update(request):
     user = request.user
@@ -117,117 +106,90 @@ def account_login(request):
             return Response("User with email do not exist")
 
 
-# @api_view(['POST'])
-# {
-# "email": "alabaolanrewaju13@gmail.com",
-# "password": "chryz1342003"
-# }
-# def account_login(request):
-#         # logout(request)
-#         serializer = LoginSerializer(data=request.data)
-#         if serializer.is_valid():
-#             print(serializer.data)
-#             email = serializer.data['email']
-#             password = serializer.data['password']
-#             try:
-#                 user = get_object_or_404(User, email=email)
-#                 if user:
-#                     user = authenticate(request, email=email, password=password)
-#                     if user:
-#                         login(request, user)
-#                         return Response('User is now authenticated')
-#                     else:
-#                             return Response("User password is incorrect")
-#                 else:
-#                     return Response("User with email do not exist")
-#             except:
-#                 return Response("User with email do not exist")
-#         return Response(serializer.errors)
 
 
-
-def resolve_account_details(request, account_number, account_bank):
-    url = "https://api.flutterwave.com/v3/accounts/resolve"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + settings.FLUTTERWAVE_SECRET_KEY,
-    }
-    data = {
-        "account_number": account_number,
-        "account_bank": account_bank,
-    }
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return False
+# def resolve_account_details(request, account_number, account_bank):
+#     url = "https://api.flutterwave.com/v3/accounts/resolve"
+#     headers = {
+#         "Content-Type": "application/json",
+#         "Authorization": "Bearer " + settings.FLUTTERWAVE_SECRET_KEY,
+#     }
+#     data = {
+#         "account_number": account_number,
+#         "account_bank": account_bank,
+#     }
+#     response = requests.post(url, headers=headers, json=data)
+#     if response.status_code == 200:
+#         return response.json()
+#     else:
+#         return False
     
 
 
-def get_all_banks(request):
-    flutterwave_currency_code = 'NG'
-    url = f"https://api.flutterwave.com/v3/banks/{flutterwave_currency_code}"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + settings.FLUTTERWAVE_SECRET_KEY,
-    }
-    response = requests.get(url, headers=headers)
-    result = response.json().get("data")
-    return result
+# def get_all_banks(request):
+#     flutterwave_currency_code = 'NG'
+#     url = f"https://api.flutterwave.com/v3/banks/{flutterwave_currency_code}"
+#     headers = {
+#         "Content-Type": "application/json",
+#         "Authorization": "Bearer " + settings.FLUTTERWAVE_SECRET_KEY,
+#     }
+#     response = requests.get(url, headers=headers)
+#     result = response.json().get("data")
+#     return result
 
 
-class user_account_bank(APIView):
-    def post(self, request, account_number, bank_code):
-        banks = get_all_banks(request)
-        for bank in banks:
-            if bank_code == bank['code']:
-                bank_name = bank['name']
-                bank_code = bank['code']
-        response = resolve_account_details(request, account_number, bank_code)
-        account_name = response.get("data").get("account_name")
-        if not Bank_Info.objects.filter(user=request.user).exists():
-            bank_info = Bank_Info.objects.create(
-                account_number = account_number,
-                account_name = account_name,
-                bank_name = bank_name,
-                bank_code = bank_code,
-                user = request.user
-                )
-            serializer = BankInfoSerializer(bank_info, many=False)
-            return Response(serializer.data)
-        return Response('Bank account exist for this user, update it using put method')
+# class user_account_bank(APIView):
+#     def post(self, request, account_number, bank_code):
+#         banks = get_all_banks(request)
+#         for bank in banks:
+#             if bank_code == bank['code']:
+#                 bank_name = bank['name']
+#                 bank_code = bank['code']
+#         response = resolve_account_details(request, account_number, bank_code)
+#         account_name = response.get("data").get("account_name")
+#         if not Bank_Info.objects.filter(user=request.user).exists():
+#             bank_info = Bank_Info.objects.create(
+#                 account_number = account_number,
+#                 account_name = account_name,
+#                 bank_name = bank_name,
+#                 bank_code = bank_code,
+#                 user = request.user
+#                 )
+#             serializer = BankInfoSerializer(bank_info, many=False)
+#             return Response(serializer.data)
+#         return Response('Bank account exist for this user, update it using put method')
         
 
-    def put(self, request, account_number, bank_code):
-        if Bank_Info.objects.filter(user=request.user).exists():
-            bank_info = Bank_Info.objects.get(user=request.user)
-            banks = get_all_banks(request)
-            for bank in banks:
-                if bank_code == bank['code']:
-                    bank_name = bank['name']
-                    bank_code = bank['code']
-            bank_name =bank_name
-            bank_code = bank_code
-            response = resolve_account_details(request, account_number, bank_code)
-            account_name = response.get("data").get("account_name")
-            bank_info.account_number = account_number,
-            bank_info.account_name = account_name,
-            bank_info.bank_name = bank_name,
-            bank_info.bank_code = bank_code
-            bank_info.save()
-            serializer = BankInfoSerializer(bank_info, many=False)
-            return Response(serializer.data)
-        return Response('Bank account doest exist for this user, create one using post method')
+    # def put(self, request, account_number, bank_code):
+    #     if Bank_Info.objects.filter(user=request.user).exists():
+    #         bank_info = Bank_Info.objects.get(user=request.user)
+    #         banks = get_all_banks(request)
+    #         for bank in banks:
+    #             if bank_code == bank['code']:
+    #                 bank_name = bank['name']
+    #                 bank_code = bank['code']
+    #         bank_name =bank_name
+    #         bank_code = bank_code
+    #         response = resolve_account_details(request, account_number, bank_code)
+    #         account_name = response.get("data").get("account_name")
+    #         bank_info.account_number = account_number,
+    #         bank_info.account_name = account_name,
+    #         bank_info.bank_name = bank_name,
+    #         bank_info.bank_code = bank_code
+    #         bank_info.save()
+    #         serializer = BankInfoSerializer(bank_info, many=False)
+    #         return Response(serializer.data)
+    #     return Response('Bank account doest exist for this user, create one using post method')
         
     
 
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def delete_bank_info(request):
-    if Bank_Info.objects.filter(user=request.user).exists():
-        bank_info = Bank_Info.objects.get(user=request.user)
-        bank_info.delete()
-        return Response('Bank info deleted successfully')       
+# @api_view(['DELETE'])
+# @permission_classes([IsAuthenticated])
+# def delete_bank_info(request):
+#     if Bank_Info.objects.filter(user=request.user).exists():
+#         bank_info = Bank_Info.objects.get(user=request.user)
+#         bank_info.delete()
+#         return Response('Bank info deleted successfully')       
 
                 
 

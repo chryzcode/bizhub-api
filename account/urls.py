@@ -10,8 +10,8 @@ urlpatterns = [
     path('register/', account_register, name="account_register"),
     path('update/', account_update, name="acccount_update"),
     path('logout/', account_delete, name="account_logout"),
-    path('get-all-banks/', get_all_banks, name='get_all_banks'),
-    path('resolve-account-details/', resolve_account_details, name='resolve_account_details'),
-    path('user-account-bank/<account_number>/<bank_code>/', user_account_bank.as_view(), name='user_account_bank'), 
-    path('delete-bank-info/', delete_bank_info, name='delete_bank_info'),  
+    # path('get-all-banks/', get_all_banks, name='get_all_banks'),
+    # path('resolve-account-details/', resolve_account_details, name='resolve_account_details'),
+    # path('user-account-bank/<account_number>/<bank_code>/', user_account_bank.as_view(), name='user_account_bank'), 
+    # path('delete-bank-info/', delete_bank_info, name='delete_bank_info'),  
 ]
