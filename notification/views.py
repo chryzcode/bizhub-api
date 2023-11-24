@@ -26,7 +26,7 @@ def get_all_notifications(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_unread_notifications(request):
-    notification = Notification.objects.filter(recipient=request.user, mark_as_read=False)
+    notification = Notification.objects.filter(recipient=request.user, unread=True)
     serializer = NotificationSerializer(notification, many=True)
     return Response(serializer.data)
 
@@ -34,7 +34,7 @@ def get_unread_notifications(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_read_notifications(request):
-    notification = Notification.objects.filter(recipient=request.user, mark_as_read=True)
+    notification = Notification.objects.filter(recipient=request.user, unread=False)
     serializer = NotificationSerializer(notification, many=True)
     return Response(serializer.data)
 
@@ -44,7 +44,7 @@ def get_read_notifications(request):
 def mark_notification_as_read(request, notification_id):
     notification = Notification.objects.get(id=notification_id)
     if notification.recipient == request.user:
-        notification.mark_as_read = True
+        notification.unread = False
         notification.save()
         serializer = NotificationSerializer(notification, many=False)
         return Response(serializer.data)
