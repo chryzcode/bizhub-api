@@ -39,7 +39,7 @@ def current_user(request):
 
 @api_view(['POST'])
 def account_register(request):
-    if request.user:
+    if request.user.is_authenticated == True:
         request.user.auth_token.delete()
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
@@ -47,8 +47,8 @@ def account_register(request):
         user = User.objects.get(id=serializer.data['id'])
         user.set_password(user.password)
         user.save()
-        return Response(serializer.data)
-    return Response(serializer.errors)
+        return Response({'success':'Account created successfully'})
+    return Response({'failure':'Failure to create account'})
 
 
 @api_view(['PUT'])
@@ -84,15 +84,15 @@ def account_login(request):
     if request.method == 'POST':
         email = request.data.get('email')
         password = request.data.get('password')
+        user = User.objects.get(email=email)
         try:
-            user = get_object_or_404(User, email=email)
             if user:
                 user = authenticate(request, email=email, password=password)
                 if user:
                     token, _ = Token.objects.get_or_create(user=user)
                     Notification.objects.create(
                         level= 'success',
-                        recipient = request.user,
+                        recipient = user,
                         actor_content_type = ContentType.objects.get_for_model(user),
                         verb= "An order invoice has been created",
                         actor_object_id = user.id,
