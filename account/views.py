@@ -48,7 +48,7 @@ def account_register(request):
         user.is_active = True
         # user.set_password(user.password)
         user.save()
-        return Response({'success':'Account created successfully'})
+        return Response({'success':'Account created successfully'}, serializer.data)
     return Response({'failure':'Failure to create account'})
 
 
@@ -85,22 +85,25 @@ def account_login(request):
     if request.method == 'POST':
         email = request.data.get('email')
         password = request.data.get('password')
-        user = User.objects.get(email=email)
-        if user:
-            # user = authenticate(request, email=email, password=password)
-            # if user:
-            if user.password == password:
-                token, _ = Token.objects.get_or_create(user=user)
-                Notification.objects.create(
-                    level= 'success',
-                    recipient = user,
-                    actor_content_type = ContentType.objects.get_for_model(user),
-                    verb= "An attempt to login with this account",
-                    actor_object_id = user.id,
-                )
-                return Response({'token': token.key}, status=status.HTTP_200_OK)
+        if User.objects.get(email=email).exist():
+            user = User.objects.get(email=email)
+            if user:
+                # user = authenticate(request, email=email, password=password)
+                # if user:
+                if user.password == password:
+                    token, _ = Token.objects.get_or_create(user=user)
+                    Notification.objects.create(
+                        level= 'success',
+                        recipient = user,
+                        actor_content_type = ContentType.objects.get_for_model(user),
+                        verb= "An attempt to login with this account",
+                        actor_object_id = user.id,
+                    )
+                    return Response({'token': token.key}, status=status.HTTP_200_OK)
+                else:
+                        return Response("User password is incorrect")
             else:
-                    return Response("User password is incorrect")
+                return Response("User with email do not exist")
         else:
             return Response("User with email do not exist")
       
