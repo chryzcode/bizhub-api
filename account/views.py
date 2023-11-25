@@ -85,7 +85,7 @@ def account_login(request):
     if request.method == 'POST':
         email = request.data.get('email')
         password = request.data.get('password')
-        if User.objects.get(email=email).exist():
+        if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
             if user:
                 # user = authenticate(request, email=email, password=password)
