@@ -81,7 +81,6 @@ def account_logout(request):
 
 @api_view(['POST'])
 def account_login(request):
-    print('hi')
     if request.method == 'POST':
         email = request.data.get('email')
         password = request.data.get('password')
