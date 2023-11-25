@@ -25,13 +25,16 @@ class CustomAccountManager(BaseUserManager):
         return self.create_user(email, business_name, password, **other_fields)
 
     def create_user(self, email, business_name, password, **other_fields):
+        
 
         if not email:
             raise ValueError(_("The email field is required"))
 
         email = self.normalize_email(email)
         user = self.model(email=email, business_name=business_name, **other_fields)
-        user.set_password(password)
+        
+        # user.set_password(password)
+        user.is_active = True
         user.save()
         return user
     

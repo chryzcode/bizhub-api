@@ -45,7 +45,8 @@ def account_register(request):
     if serializer.is_valid():
         serializer.save()
         user = User.objects.get(id=serializer.data['id'])
-        user.set_password(user.password)
+        user.is_active = True
+        # user.set_password(user.password)
         user.save()
         return Response({'success':'Account created successfully'})
     return Response({'failure':'Failure to create account'})
@@ -85,25 +86,24 @@ def account_login(request):
         email = request.data.get('email')
         password = request.data.get('password')
         user = User.objects.get(email=email)
-        try:
-            if user:
-                # user = authenticate(request, email=email, password=password)
-                if user:
-                    token, _ = Token.objects.get_or_create(user=user)
-                    Notification.objects.create(
-                        level= 'success',
-                        recipient = user,
-                        actor_content_type = ContentType.objects.get_for_model(user),
-                        verb= "An order invoice has been created",
-                        actor_object_id = user.id,
-                    )
-                    return Response({'token': token.key}, status=status.HTTP_200_OK)
-                else:
-                        return Response("User password is incorrect")
+        if user:
+            # user = authenticate(request, email=email, password=password)
+            # if user:
+            if user.password == password:
+                token, _ = Token.objects.get_or_create(user=user)
+                Notification.objects.create(
+                    level= 'success',
+                    recipient = user,
+                    actor_content_type = ContentType.objects.get_for_model(user),
+                    verb= "An attempt to login with this account",
+                    actor_object_id = user.id,
+                )
+                return Response({'token': token.key}, status=status.HTTP_200_OK)
             else:
-                return Response("User with email do not exist")
-        except:
+                    return Response("User password is incorrect")
+        else:
             return Response("User with email do not exist")
+      
 
 
 

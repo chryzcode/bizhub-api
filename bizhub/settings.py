@@ -54,12 +54,12 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.TokenAuthentication',
-#     ],
-#     # Other settings...
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    # Other settings...
+}
 
 DJANGO_NOTIFICATIONS_CONFIG = {"USE_JSONFIELD": True}
 
