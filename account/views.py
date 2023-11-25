@@ -48,8 +48,8 @@ def account_register(request):
         user.is_active = True
         # user.set_password(user.password)
         user.save()
-        return Response({'success':'Account created successfully'}, serializer.data)
-    return Response({'failure':'Failure to create account'}, serializer.errors)
+        return Response({'success':'Account created successfully', 'data':serializer.data})
+    return Response({'failure':'Failure to create account', 'errors':serializer.errors})
 
 
 @api_view(['PUT'])
