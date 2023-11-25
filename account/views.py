@@ -81,13 +81,14 @@ def account_logout(request):
 
 @api_view(['POST'])
 def account_login(request):
+    print('hi')
     if request.method == 'POST':
         email = request.data.get('email')
         password = request.data.get('password')
         user = User.objects.get(email=email)
         try:
             if user:
-                user = authenticate(request, email=email, password=password)
+                # user = authenticate(request, email=email, password=password)
                 if user:
                     token, _ = Token.objects.get_or_create(user=user)
                     Notification.objects.create(
