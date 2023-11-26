@@ -39,19 +39,22 @@ def create_order(request, client_id):
     return Response(serializer.errors)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_order(request, order_id):
     order = Order.objects.get(id=order_id)
-    serializer = OrderSerializer(order, many=False)
-    return Response(serializer.data)
+    if request.user == order.client or order.user:
+        serializer = OrderSerializer(order, many=False)
+        return Response(serializer.data)
+    else:
+        return Response("Unauthorized")
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def get_buiness_orders(request):
     orders = Order.objects.filter(user=request.user)
     serializer = OrderSerializer(orders, many=True)
     
     for order in orders:
-        print('hi')
         if order.billing_status == False and datetime.datetime.now().date() > order.due_date:
             print('here')
             Notification.objects.create(
@@ -66,7 +69,7 @@ def get_buiness_orders(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def filter_buiness_orders(request, client_id):
+def filter_buiness_orders(request, client_id):#for all clients invoices
     client = Client.objects.get(id=client_id)
     if client.user == request.user:
         orders = Order.objects.filter(client=client)
