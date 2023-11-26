@@ -186,4 +186,5 @@ django_heroku.settings(locals())
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
+    'https://taskpro-klusterthon.vercel.app',
 ]
