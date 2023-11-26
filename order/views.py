@@ -56,14 +56,38 @@ def get_buiness_orders(request):
     
     for order in orders:
         if order.billing_status == False and datetime.datetime.now().date() > order.due_date:
-            print('here')
             Notification.objects.create(
                 level= 'success',
                 recipient = request.user,
                 actor_content_type = ContentType.objects.get_for_model(order),
-                verb= "An order invoice has been created",
+                verb= "An order invoice has been paid",
                 actor_object_id = order.id,
             )
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_unpaid_buiness_orders(request):
+    orders = Order.objects.filter(user=request.user, billing_status=False)
+    serializer = OrderSerializer(orders, many=True)
+    for order in orders:
+        Notification.objects.create(
+            level= 'success',
+            recipient = request.user,
+            actor_content_type = ContentType.objects.get_for_model(order),
+            verb= "An order invoice has been paid",
+            actor_object_id = order.id,
+        )
+    return Response(serializer.data)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_paid_buiness_orders(request):
+    orders = Order.objects.filter(user=request.user, billing_status=True)
+    serializer = OrderSerializer(orders, many=True)
     return Response(serializer.data)
 
 

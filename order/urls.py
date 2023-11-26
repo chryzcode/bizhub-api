@@ -7,4 +7,6 @@ urlpatterns = [
     path('delete/<order_id>/', delete_order, name='delete_order'),
     path('get/<order_id>/', get_order, name='get_order'),
     path('business-orders/', get_buiness_orders, name='get_buiness_orders'),
+    path('unpaid/', get_unpaid_buiness_orders, name='get_unpaid_buiness_orders'),
+    path('paid/', get_paid_buiness_orders, name='get_paid_buiness_orders'),
 ]
