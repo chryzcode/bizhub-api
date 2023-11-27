@@ -91,7 +91,7 @@ def initiate_payment(request: HttpRequest, pk) -> HttpResponse:
             client = order.client,
             amount = order.amount,
             email =  order.client.email,
-            phone = order.client.phone,
+            phone = order.client.contact,
             address = order.client.address,
             order = order,
         )
