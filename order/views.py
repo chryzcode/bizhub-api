@@ -39,14 +39,14 @@ def create_order(request, client_id):
     return Response(serializer.errors)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def get_order(request, order_id):
     order = Order.objects.get(id=order_id)
-    if request.user == order.client or order.user:
-        serializer = OrderSerializer(order, many=False)
-        return Response(serializer.data)
-    else:
-        return Response("Unauthorized")
+    # if request.user == order.client or order.user:
+    serializer = OrderSerializer(order, many=False)
+    return Response(serializer.data)
+    # else:
+    #     return Response("Unauthorized")
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
