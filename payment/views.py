@@ -90,9 +90,9 @@ def initiate_payment(request: HttpRequest, pk) -> HttpResponse:
             user = business, 
             client = order.client,
             amount = order.amount,
-            email =  order.email,
-            phone = order.phone,
-            address = order.address,
+            email =  order.client.email,
+            phone = order.client.phone,
+            address = order.client.address,
             order = order,
         )
         # verify_payment(request, payment.ref)
